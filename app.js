@@ -7,7 +7,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 
-const dashboardRouter = require("./src/dashboard/dashboard.route");
+const dashboardRouter = require("./src/dashboard/dashboard.routes");
+const sanLuongRouter = require("./src/BaoCaoSanLuong/sanluong.routes");
+const sfqRouter = require("./src/StockFittingQuality/sfq.routes");
 
 dotenv.config();
 
@@ -42,9 +44,11 @@ io.sockets.on("connection", function (socket) {
 app.set("etag", "strong");
 app.set("socketio", io);
 
-app.get("/*", (req, res) => {
-    // res.send("APP IS RUNNING");
+app.use("/api/dashboard", dashboardRouter);
+app.use("/api/bcsl", sanLuongRouter);
+app.use("/api/sfq", sfqRouter);
 
+app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "build/index.html"), function (err) {
         if (err) {
             res.status(500).send(err);
@@ -52,8 +56,6 @@ app.get("/*", (req, res) => {
     });
 });
 
-
-app.use("/dashboard", dashboardRouter);
 
 app.use((req, res, next) => {
     next(createError(404));

@@ -1,28 +1,13 @@
 const sql = require("mssql");
+// const { config } = require("./fileconfig");
 require("dotenv").config();
-const config = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  server: process.env.DB_SERVER,
-  port: Number(process.env.PORTSQL),
-  database: process.env.DB_DATABASE,
-  authentication: {
-    type: "default",
-  },
-  options: {
-    encrypt: true,
-    trustServerCertificate: true,
-    cryptoCredentialsDetails: {
-      minVersion: "TLSv1",
-    },
-  },
-};
-async function connectDB() {
+
+async function connectDB(config) {
   const pool = new sql.ConnectionPool(config);
 
   try {
     await pool.connect();
-    console.log("Connected to DB");
+    // console.log("Connected to DB");
     return pool;
   } catch (err) {
     console.log("Failed to connect to DB", err);
@@ -31,10 +16,10 @@ async function connectDB() {
   }
 }
 
-exports.Execute = async (query) => {
+exports.Execute = async (config,query) => {
   // const connect = await sql.connect(config);
   // console.log("Kết nối thành công đến cơ sở dữ liệu MSSQL.");
-  const DB = await connectDB();
+  const DB = await connectDB(config);
 
   try {
     // Thực hiện các thao tác với cơ sở dữ liệu ở đây
