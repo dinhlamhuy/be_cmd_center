@@ -353,7 +353,26 @@ const Get_Manpower_Month = async (date) => {
 const Get_Manpower_Over_Time= async (date)=>{
     try {
         const rs = await db.Execute(
-          config_hris,);
+          config_hris,`DECLARE @DAY VARCHAR(20) =CONVERT(DATE,'${date}'),@REMOVE_CHECK_IN BIT = 0, @REMOVE_CHECK_OUT BIT = 0, @TIME_OUT_CHC VARCHAR(20), @QTY_TOTAL INT,@QTY_CHC INT 
+          SET @TIME_OUT_CHC = '16:45:59'
+          IF OBJECT_ID('tempdb..#Overtime') IS NOT NULL DROP TABLE #Overtime
+          SELECT	P.Person_Serial_Key, S.Shift_Serial_key, Card_Number,
+                      CASE WHEN @REMOVE_CHECK_IN = 1 THEN '' ELSE ISNULL((SELECT MIN(Check_Time) FROM Rec_Check_In_Out RCIO WHERE RCIO.Card_Number = WT.Card_Number AND CONVERT(DATE, Check_Time) = @DAY), '') END RAW_CHECK_IN,
+
+                      CASE WHEN @REMOVE_CHECK_OUT = 1 THEN '' ELSE ISNULL((SELECT MAX(Check_Time) FROM Rec_Check_In_Out RCIO WHERE RCIO.Card_Number = WT.Card_Number AND Check_Time BETWEEN @DAY AND DATEADD(HH, 5, CONVERT(datetime,@DAY) +''+ CONVERT(varchar,Finish_Time,114))), '')END RAW_CHECK_OUT
+              INTO #Overtime		
+              FROM	Data_Person P, Data_Work_Time WT, Data_Shift S
+              WHERE	P.Person_Serial_Key = WT.Person_Serial_Key
+                      AND WT.Shift_Serial_key = S.Shift_Serial_Key
+                      AND Check_Day = @DAY
+                      AND CONVERT(TIME, Start_Time) < CONVERT(TIME, Finish_Time)
+                      AND Is_Lock = 0
+
+              SET @QTY_TOTAL = (SELECT COUNT(Person_Serial_Key) FROM #Overtime)
+
+              SET @QTY_CHC = (SELECT COUNT(Person_Serial_Key) FROM #Overtime WHERE CONVERT(TIME,RAW_CHECK_OUT) < @TIME_OUT_CHC)
+
+              SELECT @QTY_TOTAL - @QTY_CHC qty_overtime`);
 
           return rs.recordset || null;
         } catch (error) {
