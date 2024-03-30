@@ -15,12 +15,12 @@ exports.configscreen = {
       },
     },
   };
-exports.config_bcsl = {
-    user: process.env.DB_USER_bcsl,
-    password: process.env.DB_PASS_bcsl,
-    server: process.env.DB_SERVER_bcsl,
-    port: Number(process.env.PORTSQL_bcsl),
-    database: process.env.DB_DATABASE_bcsl,
+exports.config_eip = {
+    user: process.env.DB_USER_eip,
+    password: process.env.DB_PASS_eip,
+    server: process.env.DB_SERVER_eip,
+    port: Number(process.env.PORTSQL_eip),
+    database: process.env.DB_DATABASE_eip,
     authentication: {
       type: "default",
     },
@@ -55,6 +55,23 @@ exports.config_mescc = {
     server: process.env.DB_SERVER_mescc,
     port: Number(process.env.PORTSQL_mescc),
     database: process.env.DB_DATABASE_mescc,
+    authentication: {
+      type: "default",
+    },
+    options: {
+      encrypt: false,
+      trustServerCertificate: true,
+      cryptoCredentialsDetails: {
+        minVersion: "TLSv1",
+      },
+    },
+  };
+exports.config_mescc115 = {
+    user: process.env.DB_USER_mescc115,
+    password: process.env.DB_PASS_mescc115,
+    server: process.env.DB_SERVER_mescc115,
+    port: Number(process.env.PORTSQL_mescc115),
+    database: process.env.DB_DATABASE_mescc115,
     authentication: {
       type: "default",
     },
