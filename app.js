@@ -17,11 +17,13 @@ const AvailabilityKPI_Router = require("./src/AvailabilityKPI/AvailabilityKPI.ro
 const StockFitting_Router = require("./src/StockFitting/Stock_Fitting.routes");
 const DataProductType_Router = require("./src/Data_Product_Type/Data_Product_Type.routes");
 const DataQuality_Router = require("./src/Data_Quality/Data_Quality.routes");
+const HRLHG_Router = require("./src/HR_LHG/HRLHG.routes");
+const ShippingSchedule_Router = require("./src/ShippingSchedule/ShippingSchedule.routes");
 
 dotenv.config();
 
 const app = express();
-// app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "build")));
 app.use(morgan("dev"));
 app.use(
     bodyParser.urlencoded({
@@ -61,14 +63,15 @@ app.use("/api/akpi", AvailabilityKPI_Router);
 app.use("/api/sf", StockFitting_Router);
 app.use("/api/dpt", DataProductType_Router);
 app.use("/api/quanlity", DataQuality_Router);
+app.use("/api/hr", HRLHG_Router);
+app.use("/api/shipping", ShippingSchedule_Router);
 
-app.get("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "build/index.html"), function (err) {
-        if (err) {
-            res.status(500).send(err);
-        }
-    });
-});
+ app.get("/*", (req, res) => {
+     res.sendFile(path.join(__dirname, "build/index.html"), function (err) {
+         if (err) {
+             res.status(500).send(err);
+         }     });
+ });
 
 
 app.use((req, res, next) => {

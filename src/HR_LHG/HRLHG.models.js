@@ -89,7 +89,7 @@ const Get_Value_Accident = async () => {
     return null;
   }
 };
-const Get_Manpower_Build_Lean = async (setBuilding) => {
+exports.Get_Manpower_Build_Lean = async (setBuilding) => {
   try {
     const rs = await db.Execute(
       config_hris,
@@ -113,7 +113,7 @@ const Get_Manpower_Build_Lean = async (setBuilding) => {
         Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key
         WHERE Nationality_Serial_Key IN ('S00001','S00009','S00006')) 
         AND CONVERT(DATE,Date_Come_In) <=@SETDATE AND CONVERT(DATE,Date_Work_End) >= @STARTDATE 
-        AND DP.Building LIKE "+setBuilding+ @")
+        AND DP.Building LIKE '%${setBuilding}%')
         SET @MATERNITY = 
         (SELECT COUNT(Person_ID) Maternity_Leave
         FROM Data_Vacation_Detail V  
@@ -173,7 +173,7 @@ const Get_Manpower_Build_Lean = async (setBuilding) => {
         @Accident Accident
         `
     );
-    return rs.recordset || null;
+    return rs.recordset[0] || null;
   } catch (error) {
     return null;
   }
@@ -181,28 +181,30 @@ const Get_Manpower_Build_Lean = async (setBuilding) => {
 
 exports.Get_Manpower_Build_Lean_Detail = async (setBuilding) => {
   try {
-    // let query='';
-    // if(setBuilding.includes('A')){
-    //     query=`('A_G01','A_M01','A_G02','A_M02','A_G03','A_M03','A_G04','A_M04','A_G05','A_M05','A_G06','A_M06','A_G07','A_M07','A_G08','A_M08','A_G09','A_M09','A_G10','A_M10','A_G11','A_M11','A_G12','A_M12','A_G13','A_M13','A_G14','A_M14','A_G15','A_M15','A_G16','A_M16')`;
-    // }else if(setBuilding.includes('B')){
-    //     query=`('B_G01','B_M01','B_G02','B_M02','B_G03','B_M03','B_G04','B_M04','B_G05','B_M05','B_G06','B_M06','B_G07','B_M07','B_G08','B_M08','B_G09','B_M09','B_G10','B_M10','B_G11','B_M11','B_G12','B_M12','B_G13','B_M13')`;
-    // }else if(setBuilding.includes('C')){
-    //     query=`('C_G01','C_M01','C_G02','C_M02','C_G03','C_M03','C_G04','C_M04','C_G05','C_M05','C_G06','C_M06','C_G07','C_M07')`;
-    // }else if(setBuilding.includes('D')){
-    //     query=`('D3_G01','D3_M01','D3_G02','D3_M02','D3_G03','D3_M03','D3_G04','D3_M04','D3_G05','D3_M05','D3_G06','D3_M06','D3_G07','D3_M07','D3_G08','D3_M08','D3_G09','D3_M09','D3_G10','D3_M10','D3_G11','D3_M11','D3_G12','D3_M12','D3_G13','D3_M13','D3_G14','D3_M14','D3_G15','D3_M15','D3_G16','D3_M16')`;
-    // }else if(setBuilding.includes('R2')){
-    //     query=`('GCD_UV','GCD_C1','GCD_C2','GCD_C3','GCD_C4','GCD_C5','GCD_C6','GCD_C10','GCD_C11','GCD_C12','GCD_C13','GCD_C14','GCD_C15','GCD_C16','GCD_C17','GCD_C18','GCD_C19','GCD_MAIDE')`;
-    // }else if(setBuilding.includes('R1')){
-    //     query=`('VANMALUC','CCS','KTCCS_XD','LHG_KTD','CBLD')`;
-    // }
+    let query='';
+    if(setBuilding.includes('A' || setBuilding.includes('a'))){
+        query=`('A_G01','A_M01','A_G02','A_M02','A_G03','A_M03','A_G04','A_M04','A_G05','A_M05','A_G06','A_M06','A_G07','A_M07','A_G08','A_M08','A_G09','A_M09','A_G10','A_M10','A_G11','A_M11','A_G12','A_M12','A_G13','A_M13','A_G14','A_M14','A_G15','A_M15','A_G16','A_M16')`;
+    }else if(setBuilding.includes('B') || setBuilding.includes('b')){
+        query=`('B_G01','B_M01','B_G02','B_M02','B_G03','B_M03','B_G04','B_M04','B_G05','B_M05','B_G06','B_M06','B_G07','B_M07','B_G08','B_M08','B_G09','B_M09','B_G10','B_M10','B_G11','B_M11','B_G12','B_M12','B_G13','B_M13')`;
+    }else if(setBuilding.includes('C') || setBuilding.includes('c')){
+        query=`('C_G01','C_M01','C_G02','C_M02','C_G03','C_M03','C_G04','C_M04','C_G05','C_M05','C_G06','C_M06','C_G07','C_M07')`;
+    }else if(setBuilding.includes('D')){
+        query=`('D3_G01','D3_M01','D3_G02','D3_M02','D3_G03','D3_M03','D3_G04','D3_M04','D3_G05','D3_M05','D3_G06','D3_M06','D3_G07','D3_M07','D3_G08','D3_M08','D3_G09','D3_M09','D3_G10','D3_M10','D3_G11','D3_M11','D3_G12','D3_M12','D3_G13','D3_M13','D3_G14','D3_M14','D3_G15','D3_M15','D3_G16','D3_M16')`;
+    }else if(setBuilding.includes('R2') || setBuilding.includes('r2')){
+        query=`('GCD_UV','GCD_C1','GCD_C2','GCD_C3','GCD_C4','GCD_C5','GCD_C6','GCD_C10','GCD_C11','GCD_C12','GCD_C13','GCD_C14','GCD_C15','GCD_C16','GCD_C17','GCD_C18','GCD_C19','GCD_MAIDE')`;
+    }else if(setBuilding.includes('R1') || setBuilding.includes('r1')){
+        query=`('VANMALUC','CCS','KTCCS_XD','LHG_KTD','CBLD')`;
+    }else{
+      query=`('')`;
+    }
     const rs = await db.Execute(
       config_hris,
       `
-      DECLARE @SETDATE VARCHAR(20),@STARTDATE VARCHAR(20),@CHECK_START VARCHAR(20),@CHECK_END VARCHAR(20) 
+      DECLARE @SETDATE VARCHAR(20),@STARTDATE VARCHAR(20),@CHECK_START VARCHAR(20),@CHECK_END VARCHAR(20)
       DECLARE @MATERNITY INT, @NO_CHECK INT, @EXPECTED INT, @LEAVE INT
-      SET @STARTDATE = '"+SetDay.ToString("yyyy/MM/")+ @"' + '1'
-      SET @SETDATE = '" + SetDay.ToString("yyyy/MM/dd") + @"'
-      SET @CHECK_END = DATEADD(DAY, 1, '" + SetDay.ToString("yyyy/MM/dd") + @"')
+      SET @STARTDATE = CONVERT(VARCHAR(7), GETDATE(), 111) + '/01'
+      SET @SETDATE = CONVERT(DATE, GETDATE())
+      SET @CHECK_END = DATEADD(DAY, 1, CONVERT(DATE, GETDATE()))
       SET @CHECK_START = @SETDATE + ' 5:00:00'
       SET @CHECK_END = @CHECK_END + ' 5:00:00'
     SELECT A.Department_ID Name, 
@@ -218,7 +220,7 @@ exports.Get_Manpower_Build_Lean_Detail = async (setBuilding) => {
       Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key
       WHERE Nationality_Serial_Key IN('S00001', 'S00009', 'S00006'))
       AND CONVERT(DATE, Date_Come_In) <= @SETDATE AND CONVERT(DATE, Date_Work_End) >= @STARTDATE
-      AND DP.Department_ID IN " + setBuilding+ @"
+      AND DP.Department_ID IN ${query}
       GROUP BY Department_ID) A
       LEFT JOIN
       (SELECT COUNT(Person_ID) Maternity_Leave, Department_ID
@@ -262,13 +264,76 @@ exports.Get_Manpower_Build_Lean_Detail = async (setBuilding) => {
       ON A.Department_ID = C.Department_ID
     `
     );
+    console.log(` DECLARE @SETDATE VARCHAR(20),@STARTDATE VARCHAR(20),@CHECK_START VARCHAR(20),@CHECK_END VARCHAR(20)
+    DECLARE @MATERNITY INT, @NO_CHECK INT, @EXPECTED INT, @LEAVE INT
+    SET @STARTDATE = CONVERT(VARCHAR(7), GETDATE(), 111) + '/01'
+    SET @SETDATE = CONVERT(DATE, GETDATE())
+    SET @CHECK_END = DATEADD(DAY, 1, CONVERT(DATE, GETDATE()))
+    SET @CHECK_START = @SETDATE + ' 5:00:00'
+    SET @CHECK_END = @CHECK_END + ' 5:00:00'
+  SELECT A.Department_ID Name, 
+        ISNULL(ExpectedAttendence, 0)ExpectedAttendence,
+        ISNULL(LeaveFactory, 0)LeaveFactory,
+        ISNULL(Absence, 0)Absence,
+        ISNULL(Maternity_Leave, 0)MaternityLeave
+  FROM(SELECT COUNT(P.Person_ID) ExpectedAttendence, Department_ID FROM  Data_Person P
+    LEFT JOIN Data_Department DP ON DP.Department_Serial_Key = P.Department_Serial_Key
+    WHERE P.Magneticcard_ID <> ''
+    AND P.Department_Serial_Key NOT IN ('DP0000000000055','DP0000000000056','DP0000000000079','DP0000000000083','DP0000000000101','DP0000000000104','DP0000000000115','DP0000000000132','DP0000000000487','DP0000000000488','DP0000000000489','DP0000000000490')  AND
+    P.Person_Serial_Key NOT IN(SELECT DP.Person_Serial_Key FROM  Data_Person DP LEFT JOIN
+    Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key
+    WHERE Nationality_Serial_Key IN('S00001', 'S00009', 'S00006'))
+    AND CONVERT(DATE, Date_Come_In) <= @SETDATE AND CONVERT(DATE, Date_Work_End) >= @STARTDATE
+    AND DP.Department_ID IN ${query}
+    GROUP BY Department_ID) A
+    LEFT JOIN
+    (SELECT COUNT(Person_ID) Maternity_Leave, Department_ID
+    FROM Data_Vacation_Detail V
+    LEFT JOIN Data_Person P ON P.Person_Serial_Key = V.Person_Serial_Key  LEFT JOIN Data_Department DP ON DP.Department_Serial_Key = P.Department_Serial_Key
+    WHERE Vacation_Serial_Key = 'V000000021' AND
+    CONVERT(VARCHAR, @SETDATE, 101) BETWEEN Vacation_From_Date AND Vacation_To_Date AND
+    P.Person_Serial_Key NOT IN(SELECT DP.Person_Serial_Key FROM  Data_Person DP LEFT JOIN Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key WHERE Nationality_Serial_Key IN('S00001', 'S00009'))
+    AND DP.Department_ID IN ${query}
+    GROUP BY Department_ID) B
+    ON A.Department_ID = B.Department_ID
+    LEFT JOIN
+    (SELECT COUNT(P.Person_ID) Absence, Department_ID FROM  Data_Person P
+    LEFT JOIN Data_Department DD ON DD.Department_Serial_Key = P.Department_Serial_Key
+    WHERE P.Magneticcard_ID<> ''
+    AND P.Department_Serial_Key NOT IN ('DP0000000000055','DP0000000000056','DP0000000000079','DP0000000000083','DP0000000000101','DP0000000000104','DP0000000000115','DP0000000000132','DP0000000000487','DP0000000000488','DP0000000000489','DP0000000000490') 
+    AND P.Person_Serial_Key NOT IN(SELECT DP.Person_Serial_Key FROM  Data_Person DP
+    LEFT JOIN      Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key
+    WHERE Nationality_Serial_Key IN('S00001', 'S00009', 'S00006'))
+    AND CONVERT(DATE, Date_Come_In) <= @SETDATE
+    AND CONVERT(DATE, Date_Work_End) >= @STARTDATE
+    AND P.Person_Serial_Key NOT IN(SELECT Person_Serial_Key FROM Data_Person DP LEFT JOIN Rec_Check_In_Out RC ON RC.Card_Number = DP.Magneticcard_ID
+    WHERE CONVERT(DATETIME, Check_Time) > @CHECK_START AND CONVERT(DATETIME, Check_Time) <= @CHECK_END)             AND P.Person_Serial_Key NOT IN(SELECT Person_Serial_Key FROM  Data_Person WHERE
+    Magneticcard_ID <> ''
+    AND Department_Serial_Key NOT IN ('DP0000000000055','DP0000000000056','DP0000000000079','DP0000000000083','DP0000000000101','DP0000000000104','DP0000000000115','DP0000000000132','DP0000000000487','DP0000000000488','DP0000000000489','DP0000000000490') 
+    AND Person_Serial_Key NOT IN(SELECT DP.Person_Serial_Key FROM  Data_Person DP LEFT JOIN Data_Person_Detail DD ON DD.Person_Serial_Key = DP.Person_Serial_Key WHERE Nationality_Serial_Key IN('S00001', 'S00009', 'S00006'))
+    AND CONVERT(DATE, Date_Come_In) <= @SETDATE AND CONVERT(DATE, Date_Work_End) >= @STARTDATE
+    AND Person_Serial_Key NOT IN(SELECT DP.Person_Serial_Key FROM Data_Person DP LEFT JOIN Rec_Check_In_Out RC ON RC.Card_Number = DP.Magneticcard_ID WHERE CONVERT(DATETIME, Check_Time) > @CHECK_START AND CONVERT(DATETIME, Check_Time) <= @CHECK_END)
+    AND Person_Serial_Key IN(SELECT V.Person_Serial_Key FROM Data_Vacation_Detail V WHERE CONVERT(VARCHAR, @SETDATE, 101) BETWEEN  Vacation_From_Date AND Vacation_To_Date))
+    AND P.Person_Serial_Key NOT IN(SELECT Person_Serial_Key FROM Data_Shift_Register WHERE Shift_Serial_Key IN('S0002', 'S0003') AND CONVERT(VARCHAR, @SETDATE, 101) BETWEEN  Shift_From_Date AND Shift_To_Date)
+    AND DD.Department_ID IN ${query}
+    GROUP BY Department_ID) C
+    ON A.Department_ID = C.Department_ID
+    LEFT JOIN(
+    SELECT COUNT(Decided_Serial_Key) AS LeaveFactory, Department_ID FROM Data_Decided DD
+    LEFT JOIN Data_Person P ON DD.Person_Serial_Key = P.Person_Serial_Key
+    LEFT JOIN Data_Department DP ON DP.Department_Serial_Key = P.Department_Serial_Key
+    WHERE Decided_Serial_Key IN('D0011', 'D0012', 'D0013', 'D0014') AND CONVERT(DATE, Applied_Date) >= @SETDATE AND CONVERT(DATE, Applied_Date) <= @SETDATE
+    AND DP.Department_ID IN ${query}
+    GROUP BY Department_ID) D
+    ON A.Department_ID = C.Department_ID
+  `)
     return rs.recordset || null;
   } catch (error) {
     return null;
   }
 };
 
-const Get_Manpower_Last_Month = async () => {
+exports.Get_Manpower_Last_Month = async () => {
   try {
     const rs = await db.Execute(
       config_hris,
@@ -304,7 +369,7 @@ const Get_Manpower_Last_Month = async () => {
       const newTurnoverRate =
         item.ExpectedAttendence === 0
           ? 0
-          : item.LeaveFactory / item.ExpectedAttendence;
+          : parseFloat((item.LeaveFactory / item.ExpectedAttendence)*100).toFixed(2)+'%';
       const newLastMonth = item.ExpectedAttendence === 0 ? 0 : item.LastMonth;
       const newMaternityLeave =
         item.ExpectedAttendence === 0 ? 0 : item.MaternityLeave;
@@ -350,10 +415,10 @@ const Get_Manpower_Month = async (date) => {
     return null;
   }
 };
-const Get_Manpower_Over_Time= async (date)=>{
+exports.Get_Manpower_Over_Time= async ()=>{
     try {
         const rs = await db.Execute(
-          config_hris,`DECLARE @DAY VARCHAR(20) =CONVERT(DATE,'${date}'),@REMOVE_CHECK_IN BIT = 0, @REMOVE_CHECK_OUT BIT = 0, @TIME_OUT_CHC VARCHAR(20), @QTY_TOTAL INT,@QTY_CHC INT 
+          config_hris,`DECLARE @DAY VARCHAR(20) =CONVERT(DATE,GETDATE()),@REMOVE_CHECK_IN BIT = 0, @REMOVE_CHECK_OUT BIT = 0, @TIME_OUT_CHC VARCHAR(20), @QTY_TOTAL INT,@QTY_CHC INT 
           SET @TIME_OUT_CHC = '16:45:59'
           IF OBJECT_ID('tempdb..#Overtime') IS NOT NULL DROP TABLE #Overtime
           SELECT	P.Person_Serial_Key, S.Shift_Serial_key, Card_Number,
@@ -374,7 +439,7 @@ const Get_Manpower_Over_Time= async (date)=>{
 
               SELECT @QTY_TOTAL - @QTY_CHC qty_overtime`);
 
-          return rs.recordset || null;
+          return rs.recordset[0] || null;
         } catch (error) {
           return null;
         }
